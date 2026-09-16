@@ -1,13 +1,27 @@
 const scenes = document.querySelectorAll(".scene");
+const story = document.querySelector(".story");
 
 let currentScene = 0;
 let timer;
+let transitionTimer;
 
-function showScene(index) {
-    scenes.forEach(scene => {
-        scene.classList.remove("active");
-    });
+function showScene(index, withTransition = false) {
+    if (withTransition) {
+        clearTimeout(transitionTimer);
+        story.classList.remove("transitioning");
+        void story.offsetWidth;
+        story.classList.add("transitioning");
 
+        transitionTimer = setTimeout(() => {
+            scenes.forEach(scene => scene.classList.remove("active"));
+            scenes[index].classList.add("active");
+        }, 430);
+
+        setTimeout(() => story.classList.remove("transitioning"), 1200);
+        return;
+    }
+
+    scenes.forEach(scene => scene.classList.remove("active"));
     scenes[index].classList.add("active");
 }
 
@@ -18,16 +32,16 @@ function nextScene() {
         currentScene = 0;
     }
 
-    showScene(currentScene);
-
+    showScene(currentScene, true);
     timer = setTimeout(nextScene, 7000);
 }
 
 function startStory() {
     currentScene = 0;
-    showScene(currentScene);
-
     clearTimeout(timer);
+    clearTimeout(transitionTimer);
+    story.classList.remove("transitioning");
+    showScene(currentScene);
     timer = setTimeout(nextScene, 7000);
 }
 
