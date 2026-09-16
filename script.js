@@ -12,12 +12,15 @@ function showScene(index, withTransition = false) {
         void story.offsetWidth;
         story.classList.add("transitioning");
 
+        // Change the scene while the glass is covering the screen.
         transitionTimer = setTimeout(() => {
             scenes.forEach(scene => scene.classList.remove("active"));
             scenes[index].classList.add("active");
         }, 430);
 
-        setTimeout(() => story.classList.remove("transitioning"), 1200);
+        transitionTimer = setTimeout(() => {
+            story.classList.remove("transitioning");
+        }, 1200);
         return;
     }
 
@@ -26,22 +29,17 @@ function showScene(index, withTransition = false) {
 }
 
 function nextScene() {
-    currentScene++;
-
-    if (currentScene >= scenes.length) {
-        currentScene = 0;
-    }
-
+    currentScene = (currentScene + 1) % scenes.length;
     showScene(currentScene, true);
     timer = setTimeout(nextScene, 7000);
 }
 
 function startStory() {
-    currentScene = 0;
     clearTimeout(timer);
     clearTimeout(transitionTimer);
+    currentScene = 0;
     story.classList.remove("transitioning");
-    showScene(currentScene);
+    showScene(currentScene, false);
     timer = setTimeout(nextScene, 7000);
 }
 
