@@ -3,32 +3,35 @@ const story = document.querySelector(".story");
 
 let currentScene = 0;
 let timer;
-let transitionTimer;
+let sceneChangeTimer;
+let transitionEndTimer;
 
 function showScene(index, withTransition = false) {
     if (withTransition) {
-        clearTimeout(transitionTimer);
+        clearTimeout(sceneChangeTimer);
+        clearTimeout(transitionEndTimer);
         story.classList.remove("transitioning");
         void story.offsetWidth;
         story.classList.add("transitioning");
 
         // Change the scene while the glass is covering the screen.
-        transitionTimer = setTimeout(() => {
+        sceneChangeTimer = setTimeout(() => {
             scenes.forEach(scene => scene.classList.remove("active"));
-            scenes[index].classList.add("active");
+            if (scenes[index]) scenes[index].classList.add("active");
         }, 430);
 
-        transitionTimer = setTimeout(() => {
+        transitionEndTimer = setTimeout(() => {
             story.classList.remove("transitioning");
         }, 1200);
         return;
     }
 
     scenes.forEach(scene => scene.classList.remove("active"));
-    scenes[index].classList.add("active");
+    if (scenes[index]) scenes[index].classList.add("active");
 }
 
 function nextScene() {
+    if (!scenes.length) return;
     currentScene = (currentScene + 1) % scenes.length;
     showScene(currentScene, true);
     timer = setTimeout(nextScene, 7000);
@@ -36,11 +39,12 @@ function nextScene() {
 
 function startStory() {
     clearTimeout(timer);
-    clearTimeout(transitionTimer);
+    clearTimeout(sceneChangeTimer);
+    clearTimeout(transitionEndTimer);
     currentScene = 0;
     story.classList.remove("transitioning");
     showScene(currentScene, false);
-    timer = setTimeout(nextScene, 7000);
+    if (scenes.length > 1) timer = setTimeout(nextScene, 7000);
 }
 
 function restartStory() {
